@@ -25,11 +25,12 @@ class Player {
 }
 
 class Projectile {
-    constructor(x, y, radius, color) {
+    constructor(x, y, radius, color, velocity) {
         this.x = x;
         this.y = y;
         this.radius = radius;
         this.color = color;
+        this.velocity = velocity;
     }
 
     draw() {
@@ -41,8 +42,19 @@ class Projectile {
 
     update() {
         this.draw();
+        this.x = this.x + this.velocity.x;
+        this.y = this.y + this.velocity.y;
     }
 }
+
+
+let x = canvas.width / 2;
+const y = canvas.height * 0.9;
+
+const player = new Player(x, y, 30, 'blue');
+const projectiles = [];
+const enemies = [];
+
 
 function animate() {
     requestAnimationFrame(animate);
@@ -50,6 +62,9 @@ function animate() {
     player.draw();
     projectiles.forEach((projectile) => {
         projectile.update();
+    })
+    enemies.forEach((enemy, index) => {
+        enemy.update()
     })
 }
 
@@ -72,23 +87,24 @@ function move(e) {
     }
 }
 
-addEventListener('keydown', shoot, false);
+addEventListener('click', shoot, false);
 
 function shoot(e) {
-    if (e.keyCode === 32) {
-        projectiles.push(
-            new Projectile(canvas.width / 2, canvas.height / 2, 5, 'red')
-        );
+
+    const angle = Math.atan2(-90,
+        0);
+
+    const velocity = {
+        x: Math.cos(angle),
+        y: Math.sin(angle)
     }
+
+    projectiles.push(
+        new Projectile(player.x, player.y, 5, 'red', velocity)
+    );
 
 }
 
 
-let x = canvas.width / 2;
-const y = canvas.height * 0.9;
-
-
-const player = new Player(x, y, 30, 'blue');
-const projectiles = [];
-
 animate();
+
