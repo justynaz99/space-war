@@ -1,11 +1,35 @@
+<link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+
+<div class="fixed text-white text-sm ml-2 mt-1 select-none font-sans font-bold"><span>Score: </span><span
+        id="scoreEl">0</span></div>
+
+
+<div class="fixed inset-0 flex items-center justify-center" id="startDiv">
+    <div class="bg-black font-sans max-w-md w-full p-6 text-center"
+         style="border-color: white; border-style: solid; border-width: 3px">
+        <h1 class="text-4xl text-white font-bold leading-none" id="bigScoreEl">0</h1>
+        <p class="text-sm text-white mb-4">Points</p>
+        <div>
+            <button class="bg-blue-500 text-white w-10/12 py-3 rounded-full" id="startGameBtn">Start Game</button>
+        </div>
+    </div>
+</div>
+
 
 <canvas></canvas>
 <style>
     html, body {
-        width:  100%;
+        width: 100%;
         height: 100%;
         margin: 0;
-    }
-</style>
+        background-image: url("space.jpg");
 
+
+    }
+
+
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"
+        integrity="sha512-IQLehpLoVS4fNzl7IfH8Iowfm5+RiMGtHykgZJl9AWMgqx0AmJ6cRWcB+GaGVtIsnC4voMfm8f2vwtY+6oPjpQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="./index.js"></script>
