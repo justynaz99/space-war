@@ -8,6 +8,7 @@ c.canvas.height = innerHeight;
 const space = new Image();
 const planet = new Image();
 const earth = new Image();
+const person = new Image();
 
 const scoreEl = document.querySelector('#scoreEl');
 const startGameBtn = document.querySelector('#startGameBtn');
@@ -24,9 +25,9 @@ class Player {
 
     draw() {
 
-        c.filter = 'drop-shadow(0px 0px 10px white) sepia(0.3)';
+        c.filter = 'drop-shadow(0px 0px 20px #454343) sepia(0.3) blur(0.7px)';
         earth.src = 'earth.png';
-        c.drawImage(earth, this.x, this.y, this.size, this.size);
+        c.drawImage(earth, this.x, this.y, this.size + 3, this.size);
     }
 
     update() {
@@ -49,6 +50,9 @@ class Projectile {
         c.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
         c.fillStyle = 'rgba(250,249,249,1)';
         c.fill();
+        // c.filter = 'drop-shadow(0px 0px 10px #454343) blur(1px)';
+        // person.src = "person.png";
+        // c.drawImage(person, this.x, this.y, this.size, this.size);
     }
 
     update() {
@@ -82,10 +86,11 @@ class Enemy {
     }
 
     draw() {
-        c.filter = 'drop-shadow(0px 0px 3px white)';
+        // c.filter = 'drop-shadow(0px 0px 3px white)';
+        c.filter = 'drop-shadow(0px 0px 10px #828181) blur(0.9px)';
         console.log(images[this.i]);
         planet.src = images[this.i];
-        c.drawImage(planet, this.x, this.y, this.radius, this.radius);
+        c.drawImage(planet, this.x, this.y, this.radius - 5, this.radius);
 
 
     }
@@ -249,6 +254,14 @@ function load() {
     c.filter = 'blur(1px)';
     space.src = 'space.jpg';
     c.drawImage(space, 0, 0, canvas.width, canvas.height);
+}
+
+addEventListener('keydown', pauseGame, false);
+
+function pauseGame(e) {
+    if (e.keyCode === 16) {
+        cancelAnimationFrame(animationId);
+    }
 }
 
 
