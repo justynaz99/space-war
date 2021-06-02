@@ -4,63 +4,15 @@ const c = canvas.getContext('2d');
 c.canvas.width = innerWidth; //by default is window.innerWidth
 c.canvas.height = innerHeight;
 
-
-const space = new Image();
-const planet = new Image();
-const earth = new Image();
-const person = new Image();
-
 const scoreEl = document.querySelector('#scoreEl');
 const startGameBtn = document.querySelector('#startGameBtn');
 const startDiv = document.querySelector('#startDiv');
 const bigScoreEl = document.querySelector('#bigScoreEl');
 
-
-class Player {
-    constructor(x, y, size) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-    }
-
-    draw() {
-
-        c.filter = 'drop-shadow(0px 0px 20px #454343) sepia(0.3) blur(0.7px)';
-        earth.src = 'earth.png';
-        c.drawImage(earth, this.x, this.y, this.size + 3, this.size);
-    }
-
-    update() {
-        this.draw();
-    }
-}
-
-class Projectile {
-    constructor(x, y, size, velocity) {
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.velocity = velocity;
-    }
-
-    draw() {
-
-        c.filter = 'contrast(1.5) sepia(0.5) blur(3px)';
-        c.beginPath();
-        c.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-        c.fillStyle = 'rgba(250,249,249,1)';
-        c.fill();
-        // c.filter = 'drop-shadow(0px 0px 10px #454343) blur(1px)';
-        // person.src = "person.png";
-        // c.drawImage(person, this.x, this.y, this.size, this.size);
-    }
-
-    update() {
-        this.draw();
-        this.x = this.x + this.velocity.x;
-        this.y = this.y + this.velocity.y;
-    }
-}
+const space = new Image();
+const planet = new Image();
+const earth = new Image();
+const person = new Image();
 
 const images = [
     "planets/earth.png",
@@ -72,29 +24,60 @@ const images = [
     "planets/venus.png"
 ];
 
-function generatePlanet() {
 
-}
-
-class Enemy {
-    constructor(x, y, radius, velocity, i) {
-        this.i = i;
+class Player {
+    constructor(x, y, height) {
         this.x = x;
         this.y = y;
-        this.radius = radius;
+        this.height = height;
+    }
+
+    draw() {
+        c.filter = 'drop-shadow(0px 0px 20px #454343) sepia(0.3) blur(0.7px)';
+        earth.src = 'earth.png';
+        c.drawImage(earth, this.x, this.y, this.height + 7, this.height);
+    }
+
+    update() {
+        this.draw();
+    }
+}
+
+class Projectile {
+    constructor(x, y, height, velocity) {
+        this.x = x;
+        this.y = y;
+        this.height = height;
         this.velocity = velocity;
     }
 
     draw() {
-        // c.filter = 'drop-shadow(0px 0px 3px white)';
-        c.filter = 'drop-shadow(0px 0px 10px #828181) blur(0.9px)';
-        console.log(images[this.i]);
-        planet.src = images[this.i];
-        c.drawImage(planet, this.x, this.y, this.radius - 5, this.radius);
-
-
+        c.filter = 'drop-shadow(0px 0px 10px #454343) blur(1px)';
+        person.src = "person.png";
+        c.drawImage(person, this.x, this.y, this.height, this.height);
     }
 
+    update() {
+        this.draw();
+        this.x = this.x + this.velocity.x;
+        this.y = this.y + this.velocity.y;
+    }
+}
+
+class Enemy {
+    constructor(x, y, height, velocity, i) {
+        this.i = i;
+        this.x = x;
+        this.y = y;
+        this.height = height;
+        this.velocity = velocity;
+    }
+
+    draw() {
+        c.filter = 'drop-shadow(0px 0px 10px #828181) blur(0.9px)';
+        planet.src = images[this.i];
+        c.drawImage(planet, this.x, this.y, this.height - 6, this.height);
+    }
 
     update() {
         this.draw();
@@ -118,19 +101,17 @@ function init() {
 }
 
 
-function spawnEnemies() {
+function generateEnemy() {
     setInterval(() => {
-
         const i = Math.round(Math.random() * 7);
-        const radius = Math.random() * (150 - 50) + 50;
-        const x = Math.floor(Math.random() * ((canvas.width - radius) - radius)) + radius;
+        const height = Math.random() * (150 - 50) + 50;
+        const x = Math.floor(Math.random() * ((canvas.width - height) - height)) + height;
         const y = -100;
         const velocity = {
             x: 0,
             y: 1
         }
-
-        enemies.push(new Enemy(x, y, radius, velocity, i));
+        enemies.push(new Enemy(x, y, height, velocity, i));
     }, 3000);
 }
 
@@ -138,65 +119,60 @@ function spawnEnemies() {
 let animationId;
 let score = 0;
 
-
 function animate() {
-
     animationId = requestAnimationFrame(animate);
+
     c.filter = 'blur(1px)';
     space.src = 'space.jpg';
     c.drawImage(space, 0, 0, canvas.width, canvas.height);
-    // c.fillStyle = 'rgba(0,0,0,0.1)';
-    // c.fillRect(0, 0, canvas.width, canvas.height);
+
     player.draw();
+
+
+    //when projectile is out of window
     projectiles.forEach((projectile, index) => {
         projectile.update();
-        //remove projectiles from edges of screen
-        if (projectile.x + projectile.size < 0 || projectile.x - projectile.size > canvas.width ||
-            projectile.y + projectile.size < 0 || projectile.y - projectile.size > canvas.width) {
+        if (projectile.x + projectile.height < 0 || projectile.x - projectile.height > canvas.width ||
+            projectile.y + projectile.height < 0 || projectile.y - projectile.height > canvas.width) {
             setTimeout(() => {
                 projectiles.splice(index, 1)
             }, 0);
         }
     })
 
-
+    //when projectile touch enemy
     enemies.forEach((enemy, index) => {
         enemy.update()
+        projectiles.forEach((projectile, projectileIndex) => {
 
+            projectiles.forEach((projectile, projectileIndex) => {
+
+                let collisionX = enemy.x + enemy.height - 30 >= projectile.x && projectile.x + projectile.height - 30 >= enemy.x;
+                let collisionY = enemy.y + enemy.height - 20 >= projectile.y && projectile.y + projectile.height + 20 >= enemy.y;
+
+
+                if (collisionY && collisionX) {
+                    score += 1;
+                    scoreEl.innerHTML = score;
+
+                    setTimeout(() => {
+                        enemies.splice(index, 1);
+                        projectiles.splice(projectileIndex, 1);
+                    }, 0)
+                }
+
+
+            })
+        })
 
         //end of the game
         const dist = canvas.height - enemy.y;
-        if (dist - enemy.radius < -20) {
-            console.log(dist);
+        if (dist - enemy.height < -20) {
             cancelAnimationFrame(animationId);
             bigScoreEl.innerHTML = score;
             startDiv.style.display = 'flex';
         }
 
-
-        //when projectile touch enemy
-        projectiles.forEach((projectile, projectileIndex) => {
-
-            projectiles.forEach((projectile, projectileIndex) => {
-                const dist = Math.hypot(projectile.x - enemy.x - enemy.radius, projectile.y - enemy.y)
-
-                if (dist - enemy.radius - projectile.size + 20 < 1) {
-
-                    score += 1;
-                    scoreEl.innerHTML = score;
-
-                    setTimeout(() => {
-
-                        // gsap.to(enemy,
-                        // {
-                        //     size : enemy.size - 20
-                        // });
-                        enemies.splice(index, 1);
-                        projectiles.splice(projectileIndex, 1);
-                    }, 0)
-                }
-            })
-        })
     })
 }
 
@@ -231,7 +207,7 @@ function shoot(e) {
             y: Math.sin(angle) * 6
         }
         projectiles.push(
-            new Projectile(player.x + 60, player.y, 5, velocity)
+            new Projectile(player.x + 60, player.y, 50, velocity)
         );
     }
 }
@@ -244,7 +220,7 @@ function startGame() {
     c.drawImage(space, 0, 0, canvas.width, canvas.height);
     init();
     animate();
-    spawnEnemies();
+    generateEnemy();
     startDiv.style.display = 'none';
 }
 
