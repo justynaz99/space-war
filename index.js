@@ -5,14 +5,32 @@ c.canvas.width = innerWidth; //by default is window.innerWidth
 c.canvas.height = innerHeight;
 
 const scoreEl = document.querySelector('#scoreEl');
+const moneyEl1 = document.querySelector('#moneyEl1');
+const moneyEl2 = document.querySelector('#moneyEl2');
 const startGameBtn = document.querySelector('#startGameBtn');
 const startDiv = document.querySelector('#startDiv');
 const bigScoreEl = document.querySelector('#bigScoreEl');
+
+const startLvl2Btn = document.querySelector('#startLvl2Btn')
+const lvl2Div = document.querySelector('#lvl2Div')
+const bigScoreElLvl2 = document.querySelector('#bigScoreElLvl2');
+
+const moneyDiv = document.querySelector('#moneyDiv');
+const startLvl3Btn = document.querySelector('#startLvl3Btn');
+const lvl3Div = document.querySelector('#lvl3Div');
+const bigScoreElLvl3 = document.querySelector('#bigScoreElLvl3');
+
+let lvl1 = true;
+let lvl2 = false;
+let lvl3 = false;
 
 const space = new Image();
 const planet = new Image();
 const earth = new Image();
 const person = new Image();
+const alien = new Image();
+const coin = new Image();
+
 
 const images = [
     "planets/earth.png",
@@ -30,6 +48,7 @@ class Player {
         this.x = x;
         this.y = y;
         this.height = height;
+
     }
 
     draw() {
@@ -40,6 +59,7 @@ class Player {
 
     update() {
         this.draw();
+
     }
 }
 
@@ -65,8 +85,8 @@ class Projectile {
 }
 
 class Enemy {
-    constructor(x, y, height, velocity, i) {
-        this.i = i;
+    constructor(x, y, height, velocity, image) {
+        this.image = image;
         this.x = x;
         this.y = y;
         this.height = height;
@@ -75,7 +95,7 @@ class Enemy {
 
     draw() {
         c.filter = 'drop-shadow(0px 0px 10px #828181) blur(0.9px)';
-        planet.src = images[this.i];
+        planet.src = images[this.image];
         c.drawImage(planet, this.x, this.y, this.height - 6, this.height);
     }
 
@@ -86,24 +106,105 @@ class Enemy {
     }
 }
 
+class Alien {
+    constructor(x, y, height, velocity) {
+        this.x = x;
+        this.y = y;
+        this.height = height;
+        this.velocity = velocity;
+    }
+
+    draw() {
+        c.filter = 'drop-shadow(0px 0px 3px #acbfa4) blur(0.9px)';
+        alien.src = 'alien.png'
+        c.drawImage(alien, this.x, this.y, this.height, this.height - 10);
+    }
+
+    update() {
+        this.draw();
+        this.x = this.x + this.velocity.x;
+        this.y = this.y + this.velocity.y;
+    }
+}
+
+class Coin {
+    constructor(x, y, height, velocity) {
+        this.x = x;
+        this.y = y;
+        this.height = height;
+        this.velocity = velocity;
+    }
+
+    draw() {
+        c.filter = 'drop-shadow(0px 0px 3px #d4bd7d) blur(0.9px)';
+        coin.src = 'coin.png'
+        c.drawImage(coin, this.x, this.y, this.height, this.height);
+    }
+
+    update() {
+        this.draw();
+        this.x = this.x + this.velocity.x;
+        this.y = this.y + this.velocity.y;
+    }
+}
+
+class Particle {
+    constructor(x, y, radius, velocity) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.color = '#828181';
+        this.velocity = velocity;
+        this.alpha = 1;
+    }
+
+    draw() {
+        c.save();
+        c.filter = 'drop-shadow(0px 0px 30px #828181) blur(2px)';
+        c.globalAlpha = this.alpha;
+        c.beginPath();
+        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+        c.fillStyle = this.color;
+        c.fill();
+        c.restore();
+    }
+
+    update() {
+        this.draw();
+        this.x = this.x + this.velocity.x;
+        this.y = this.y + this.velocity.y;
+        this.alpha -= 0.02;
+    }
+}
+
+
 let x = canvas.width / 2;
 const y = canvas.height * 0.8;
 
-let player = new Player(x, y, 150);
-let projectiles = [];
-let enemies = [];
+
+let player;
+let projectiles;
+let enemies;
+let particles;
+let aliens;
+let coins;
+let score;
+let money;
 
 function init() {
     player = new Player(x, y, 150);
     projectiles = [];
     enemies = [];
-    score = 0;
+    particles = [];
+    aliens = [];
+    coins = [];
 }
 
+const ENEMIES_TIMEOUT = 3000;
 
-function generateEnemy() {
+function generateEnemies() {
     setInterval(() => {
-        const i = Math.round(Math.random() * 7);
+        const image = Math.round(Math.random() * 7);
         const height = Math.random() * (150 - 50) + 50;
         const x = Math.floor(Math.random() * ((canvas.width - height) - height)) + height;
         const y = -100;
@@ -111,16 +212,53 @@ function generateEnemy() {
             x: 0,
             y: 1
         }
-        enemies.push(new Enemy(x, y, height, velocity, i));
-    }, 3000);
+        enemies.push(new Enemy(x, y, height, velocity, image));
+    }, ENEMIES_TIMEOUT);
+}
+
+const MAX_ALIENS_TIMEOUT = 10000;
+const MIN_ALIENS_TIMEOUT = 6000;
+
+function generateAliens() {
+    setInterval(() => {
+        const height = 100;
+        const x = Math.floor(Math.random() * ((canvas.width - height) - height)) + height;
+        const y = -100;
+        const velocity = {
+            x: 0,
+            y: 6
+        }
+        aliens.push(new Alien(x, y, height, velocity));
+    }, Math.random() * (MAX_ALIENS_TIMEOUT - MIN_ALIENS_TIMEOUT) + MIN_ALIENS_TIMEOUT);
+}
+
+const MAX_COINS_TIMEOUT = 15000;
+const MIN_COINS_TIMEOUT = 10000;
+
+function generateCoins() {
+    setInterval(() => {
+        const height = 50;
+        const x = Math.floor(Math.random() * ((canvas.width - height) - height)) + height;
+        const y = -100;
+        const velocity = {
+            x: 0,
+            y: 3
+        }
+        coins.push(new Coin(x, y, height, velocity));
+    }, Math.random() * (MAX_COINS_TIMEOUT - MIN_COINS_TIMEOUT) + MIN_COINS_TIMEOUT);
 }
 
 
 let animationId;
-let score = 0;
+
 
 function animate() {
+
     animationId = requestAnimationFrame(animate);
+
+    addEventListener('keydown', move, false);
+
+    checkScore();
 
     c.filter = 'blur(1px)';
     space.src = 'space.jpg';
@@ -128,7 +266,99 @@ function animate() {
 
     player.draw();
 
+    updateParticles();
 
+    updateProjectiles();
+
+    updateEnemies();
+
+    updateAliens();
+
+    updateCoins();
+
+}
+
+function checkScore() {
+    if (score === 2) {
+        cancelAnimationFrame(animationId);
+        particles = [];
+        removeEventListener('keydown', move, false);
+        lvl2Div.style.display = 'flex';
+        score += 10;
+        bigScoreElLvl2.innerHTML = score;
+    } else if (score === 14) {
+        cancelAnimationFrame(animationId);
+        particles = [];
+        removeEventListener('keydown', move, false);
+        lvl3Div.style.display = 'flex';
+        score += 20;
+        bigScoreElLvl3.innerHTML = score;
+    }
+}
+
+
+
+function updateEnemies() {
+    //when projectile touch enemy
+
+    enemies.forEach((enemy, index) => {
+        enemy.update()
+        projectiles.forEach((projectile, projectileIndex) => {
+
+            projectiles.forEach((projectile, projectileIndex) => {
+
+                let collisionX = enemy.x + enemy.height - 30 >= projectile.x && projectile.x + projectile.height - 30 >= enemy.x;
+                let collisionY = enemy.y + enemy.height - 20 >= projectile.y && projectile.y + projectile.height + 20 >= enemy.y;
+                let particlesQuantity = 10;
+
+                if (collisionY && collisionX) {
+                    score += 1;
+                    scoreEl.innerHTML = score;
+
+                    if (enemy.height > 100) {
+                        gsap.to(enemy,
+                            {
+                                height: enemy.height - 50,
+                                x: enemy.x + enemy.height/4
+                            });
+                        setTimeout(() => {
+                            projectiles.splice(projectileIndex, 1);
+                        }, 0)
+                    } else {
+                        setTimeout(() => {
+                            enemies.splice(projectileIndex, 1);
+                            projectiles.splice(projectileIndex, 1);
+                        }, 0)
+                        for (let i = 0; i < particlesQuantity; i++) {
+                            particles.push(new Particle(projectile.x, projectile.y, 3, {
+                                x: (Math.random() - 0.5) * 3,
+                                y: (Math.random() - 0.5) * 3
+                            } ))
+                        }
+                    }
+                }
+
+            })
+        })
+
+
+        //end of the game
+        let dist = canvas.height - enemy.y;
+        if (dist - enemy.height < -20) {
+            cancelAnimationFrame(animationId);
+            removeEventListener('keydown', move, false);
+            bigScoreEl.innerHTML = score;
+            bigScoreElLvl2.innerHTML = score;
+            bigScoreElLvl3.innerHTML = score;
+            startDiv.style.display = 'flex';
+        }
+
+    })
+
+
+}
+
+function updateProjectiles() {
     //when projectile is out of window
     projectiles.forEach((projectile, index) => {
         projectile.update();
@@ -139,62 +369,72 @@ function animate() {
             }, 0);
         }
     })
+}
 
-    //when projectile touch enemy
-    enemies.forEach((enemy, index) => {
-        enemy.update()
-        projectiles.forEach((projectile, projectileIndex) => {
+function updateParticles() {
+    particles.forEach((particle, index) => {
+        if(particle.alpha <= 0) {
+            particles.splice(index, 1)
+        } else {
+            particle.update();
+        }
+    })
+}
 
-            projectiles.forEach((projectile, projectileIndex) => {
+function updateAliens() {
+    aliens.forEach((alien, index) => {
+        alien.update();
 
-                let collisionX = enemy.x + enemy.height - 30 >= projectile.x && projectile.x + projectile.height - 30 >= enemy.x;
-                let collisionY = enemy.y + enemy.height - 20 >= projectile.y && projectile.y + projectile.height + 20 >= enemy.y;
+        let collisionX = alien.x + alien.height - 30 >= player.x && player.x + player.height - 30 >= alien.x;
+        let collisionY = alien.y + alien.height - 20 >= player.y && player.y + player.height - 20 >= alien.y;
 
-
-                if (collisionY && collisionX) {
-                    score += 1;
-                    scoreEl.innerHTML = score;
-
-                    setTimeout(() => {
-                        enemies.splice(index, 1);
-                        projectiles.splice(projectileIndex, 1);
-                    }, 0)
-                }
-
-
-            })
-        })
-
-        //end of the game
-        const dist = canvas.height - enemy.y;
-        if (dist - enemy.height < -20) {
+        if (collisionX && collisionY) {
             cancelAnimationFrame(animationId);
+            removeEventListener('keydown', move, false);
             bigScoreEl.innerHTML = score;
+            bigScoreElLvl2.innerHTML = score;
+            bigScoreElLvl3.innerHTML = score;
             startDiv.style.display = 'flex';
         }
+    })
+}
 
+function updateCoins() {
+    coins.forEach((coin, index) => {
+        coin.update();
+
+        let collisionX = coin.x + coin.height - 30 >= player.x && player.x + player.height - 30 >= coin.x;
+        let collisionY = coin.y + coin.height - 20 >= player.y && player.y + player.height - 20 >= coin.y;
+
+        if (collisionX && collisionY) {
+            money++;
+            moneyEl.innerHTML = money;
+            coins.splice(index, 1);
+        }
     })
 }
 
 
-addEventListener('keydown', move, false);
+const offset = 15;
 
 function move(e) {
     switch (e.keyCode) {
         case (37):
             if (player.x > 0) {
-                player.x = player.x - 10;
+                player.x = player.x - offset;
                 player.update();
             }
             break;
         case (39):
-            if (player.x < c.canvas.width - 150) {
-                player.x = player.x + 10;
+            if (player.x < c.canvas.width - player.height) {
+                player.x = player.x + offset;
                 player.update();
             }
             break;
     }
 }
+
+
 
 addEventListener('keyup', shoot, false);
 
@@ -212,17 +452,54 @@ function shoot(e) {
     }
 }
 
+
 startGameBtn.addEventListener('click', startGame, false);
 
+startLvl2Btn.addEventListener('click', startLvl2, false);
+
+startLvl3Btn.addEventListener('click', startLvl3, false);
+
+
+
 function startGame() {
+    score = 0;
     c.filter = 'blur(1px)';
     space.src = 'space.jpg';
     c.drawImage(space, 0, 0, canvas.width, canvas.height);
     init();
     animate();
-    generateEnemy();
+    generateEnemies();
+    generateAliens();
     startDiv.style.display = 'none';
+    lvl2Div.style.display = 'none';
+    lvl3Div.style.display = 'none';
+    moneyEl1.style.display = 'none';
+    moneyEl2.style.display = 'none';
 }
+
+function startLvl2() {
+    init();
+    animate();
+    moneyEl1.style.display = 'none';
+    moneyEl2.style.display = 'none';
+    startDiv.style.display = 'none';
+    lvl2Div.style.display = 'none';
+    lvl3Div.style.display = 'none';
+}
+
+function startLvl3() {
+    money = 0;
+    init();
+    animate();
+    generateCoins();
+    startDiv.style.display = 'none';
+    lvl2Div.style.display = 'none';
+    lvl3Div.style.display = 'none';
+    moneyEl1.style.display = 'flex';
+    moneyEl2.style.display = 'flex';
+}
+
+
 
 window.onload = load;
 
@@ -230,6 +507,11 @@ function load() {
     c.filter = 'blur(1px)';
     space.src = 'space.jpg';
     c.drawImage(space, 0, 0, canvas.width, canvas.height);
+    startDiv.style.display = 'flex';
+    lvl2Div.style.display = 'none';
+    lvl3Div.style.display = 'none';
+    moneyEl1.style.display = 'none';
+    moneyEl2.style.display = 'none';
 }
 
 addEventListener('keydown', pauseGame, false);
