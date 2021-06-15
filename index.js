@@ -5,13 +5,14 @@ c.canvas.width = innerWidth; //by default is window.innerWidth
 c.canvas.height = innerHeight;
 
 const scoreEl = document.querySelector('#scoreEl');
-const moneyEl1 = document.querySelector('#moneyEl1');
-const moneyEl2 = document.querySelector('#moneyEl2');
 const startGameBtn = document.querySelector('#startGameBtn');
 const startDiv = document.querySelector('#startDiv');
 const bigScoreEl = document.querySelector('#bigScoreEl');
-const livesEl1 = document.querySelector('#livesEl1');
-const livesEl2 = document.querySelector('#livesEl2');
+const moneyDiv = document.querySelector('#moneyDiv');
+const livesDiv = document.querySelector('#livesDiv');
+const livesEl = document.querySelector('#livesEl');
+const moneyEl = document.querySelector('#moneyEl');
+
 
 const startLvl2Btn = document.querySelector('#startLvl2Btn')
 const lvl2Div = document.querySelector('#lvl2Div')
@@ -302,8 +303,8 @@ function buyLife() {
     if (money === 3) {
         lives++;
         money = 0;
-        livesEl2.innerHTML = lives;
-        moneyEl2.innerHTML = money;
+        livesEl.innerHTML = lives;
+        moneyEl.innerHTML = money;
     }
 }
 
@@ -360,8 +361,11 @@ function updateEnemies() {
 
         if ((dist - enemy.height < -20 && lives > 0)) {
             lives--;
-            livesEl2.innerHTML = lives;
-            enemies.splice(index);
+            livesEl.innerHTML = lives;
+            enemies = [];
+            coins = [];
+            aliens = [];
+
         }
 
 
@@ -400,15 +404,19 @@ function updateAliens() {
         let collisionX = alien.x + alien.height - 30 >= player.x && player.x + player.height - 30 >= alien.x;
         let collisionY = alien.y + alien.height - 20 >= player.y && player.y + player.height - 20 >= alien.y;
 
-        if (collisionX && collisionY) {
-            if (lives > 0) {
-                lives--;
-            } else {
-                cancelAnimationFrame(animationId);
-                removeEventListener('keydown', move, false);
-                bigScoreEl.innerHTML = score;
-                gameOverDiv.style.display = 'flex';
-            }
+        if (collisionX && collisionY && lives === 0) {
+            cancelAnimationFrame(animationId);
+            removeEventListener('keydown', move, false);
+            bigScoreEl.innerHTML = score;
+            gameOverDiv.style.display = 'flex';
+        }
+
+        if ((collisionX && collisionY && lives > 0)) {
+            lives--;
+            livesEl.innerHTML = lives;
+            enemies = [];
+            aliens = [];
+            coins = [];
         }
     })
 }
@@ -422,7 +430,7 @@ function updateCoins() {
 
         if (collisionX && collisionY) {
             money++;
-            moneyEl2.innerHTML = money;
+            moneyEl.innerHTML = money;
             coins.splice(index, 1);
         }
     })
@@ -465,6 +473,18 @@ function shoot(e) {
     }
 }
 
+function hideDivs() {
+    for (let i = 0; i < arguments.length; i++) {
+        arguments[i].style.display = 'none';
+    }
+}
+
+function showDivs() {
+    for (let i = 0; i < arguments.length; i++) {
+        arguments[i].style.display = 'inline';
+    }
+}
+
 
 startGameBtn.addEventListener('click', startGame, false);
 
@@ -486,14 +506,7 @@ function startGame() {
     animate();
     generateEnemies();
     lvl1 = true;
-    startDiv.style.display = 'none';
-    lvl2Div.style.display = 'none';
-    lvl3Div.style.display = 'none';
-    moneyEl1.style.display = 'none';
-    moneyEl2.style.display = 'none';
-    gameOverDiv.style.display = 'none';
-    livesEl1.style.display = 'none';
-    livesEl2.style.display = 'none';
+    hideDivs(startDiv, lvl2Div, lvl3Div, moneyDiv, gameOverDiv, livesDiv);
 }
 
 function startLvl2() {
@@ -504,16 +517,8 @@ function startLvl2() {
     lives = 0;
     lvl1 = false;
     aliens = null;
-    moneyEl1.style.display = 'none';
-    moneyEl2.style.display = 'none';
-    startDiv.style.display = 'none';
-    lvl2Div.style.display = 'none';
-    lvl3Div.style.display = 'none';
-    gameOverDiv.style.display = 'none';
-    livesEl1.style.display = 'inline';
-    livesEl2.style.display = 'inline';
-    moneyEl1.style.display = 'inline';
-    moneyEl2.style.display = 'inline';
+    hideDivs(startDiv, lvl2Div, lvl3Div, gameOverDiv);
+    showDivs(livesDiv, moneyDiv);
 
 }
 
@@ -521,10 +526,7 @@ function startLvl3() {
     init();
     animate();
     generateAliens();
-    startDiv.style.display = 'none';
-    lvl2Div.style.display = 'none';
-    lvl3Div.style.display = 'none';
-    gameOverDiv.style.display = 'none';
+    hideDivs(startDiv, lvl2Div, lvl3Div, gameOverDiv);
 }
 
 function playAgain() {
@@ -538,14 +540,7 @@ function load() {
     c.filter = 'blur(1px)';
     space.src = 'space.jpg';
     c.drawImage(space, 0, 0, canvas.width, canvas.height);
-    startDiv.style.display = 'flex';
-    lvl2Div.style.display = 'none';
-    lvl3Div.style.display = 'none';
-    moneyEl1.style.display = 'none';
-    moneyEl2.style.display = 'none';
-    gameOverDiv.style.display = 'none';
-    livesEl1.style.display = 'none';
-    livesEl2.style.display = 'none';
+    hideDivs(lvl2Div, lvl3Div, moneyDiv, gameOverDiv, livesDiv, gameOverDiv, moneyDiv);
 
 }
 
