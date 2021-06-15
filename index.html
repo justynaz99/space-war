@@ -6,36 +6,73 @@
 <div class="fixed text-white text-sm ml-2 mt-6 select-none font-sans font-bold"><span id="moneyEl1">Money: </span><span
         id="moneyEl2">0</span></div>
 
+<div class="fixed text-white text-sm ml-2 mt-11 select-none font-sans font-bold"><span id="livesEl1">Lives: </span><span
+        id="livesEl2">0</span></div>
+
 
 <div class="fixed inset-0 flex items-center justify-center" id="startDiv">
     <div class="bg-black font-sans max-w-md w-full p-6 text-center"
          style="border-color: white; border-style: solid; border-width: 3px">
-        <h1 class="text-4xl text-white font-bold leading-none" id="bigScoreEl">0</h1>
-        <p class="text-sm text-white mb-4">Points</p>
+
+        <h1 class="text-4xl text-white font-bold leading-none" >Level 1</h1>
+        <p class="text-sm text-white mb-4">Shoot enemies!</p>
+
         <div>
             <button class="bg-blue-500 text-white w-10/12 py-3 rounded-full" id="startGameBtn">Start Game</button>
         </div>
+        <p class="text-sm text-white mb-4">
+            <i class="fas fa-caret-square-left"></i>
+            <i class="fas fa-caret-square-right"></i>
+            Use arrows to move</p>
+        <p class="text-sm text-white mb-4">
+            <i class="fas fa-keyboard"></i>
+            Use space to shoot</p>
     </div>
 </div>
 
 <div class="fixed inset-0 flex items-center justify-center" id="lvl2Div">
     <div class="bg-black font-sans max-w-md w-full p-6 text-center"
          style="border-color: white; border-style: solid; border-width: 3px">
-        <h1 class="text-4xl text-white font-bold leading-none" id="bigScoreElLvl2">0</h1>
-        <p class="text-sm text-white mb-4">Points</p>
+        <h1 class="text-4xl text-white font-bold leading-none" >Level 2</h1>
+        <p class="text-sm text-white mb-4">Shoot enemies and collect gold coins!</p>
         <div>
             <button class="bg-blue-500 text-white w-10/12 py-3 rounded-full" id="startLvl2Btn">Start Level 2</button>
         </div>
+        <p class="text-sm text-white mb-4">
+            <i class="fas fa-caret-square-left"></i>
+            <i class="fas fa-caret-square-right"></i>
+            Use arrows to move</p>
+        <p class="text-sm text-white mb-4">
+            <i class="fas fa-keyboard"></i>
+            Use space to shoot</p>
     </div>
 </div>
 
 <div class="fixed inset-0 flex items-center justify-center" id="lvl3Div">
     <div class="bg-black font-sans max-w-md w-full p-6 text-center"
          style="border-color: white; border-style: solid; border-width: 3px">
-        <h1 class="text-4xl text-white font-bold leading-none" id="bigScoreElLvl3">0</h1>
-        <p class="text-sm text-white mb-4">Points</p>
+        <h1 class="text-4xl text-white font-bold leading-none" >Level 3</h1>
+        <p class="text-sm text-white mb-4">Shoot enemies, collect gold coins and avoid aliens!</p>
         <div>
             <button class="bg-blue-500 text-white w-10/12 py-3 rounded-full" id="startLvl3Btn">Start Level 3</button>
+        </div>
+        <p class="text-sm text-white mb-4">
+            <i class="fas fa-caret-square-left"></i>
+            <i class="fas fa-caret-square-right"></i>
+            Use arrows to move</p>
+        <p class="text-sm text-white mb-4">
+            <i class="fas fa-keyboard"></i>
+            Use space to shoot</p>
+    </div>
+</div>
+
+<div class="fixed inset-0 flex items-center justify-center" id="gameOverDiv">
+    <div class="bg-black font-sans max-w-md w-full p-6 text-center"
+         style="border-color: white; border-style: solid; border-width: 3px">
+        <h1 class="text-4xl text-white font-bold leading-none" id="bigScoreEl">0</h1>
+        <p class="text-sm text-white mb-4" style="margin-top: 0px">Points</p>
+        <div>
+            <button class="bg-blue-500 text-white w-10/12 py-3 rounded-full" id="playAgainBtn">Play again</button>
         </div>
     </div>
 </div>
@@ -51,7 +88,14 @@
         background-image: url("space.jpg");
     }
 
+    p {
+        margin-top: 20px;
+    }
+
 </style>
+
+<script src="https://kit.fontawesome.com/f51c476b9b.js" crossorigin="anonymous"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.5.1/gsap.min.js"
         integrity="sha512-IQLehpLoVS4fNzl7IfH8Iowfm5+RiMGtHykgZJl9AWMgqx0AmJ6cRWcB+GaGVtIsnC4voMfm8f2vwtY+6oPjpQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
