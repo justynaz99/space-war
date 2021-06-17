@@ -12,6 +12,7 @@ const moneyDiv = document.querySelector('#moneyDiv');
 const livesDiv = document.querySelector('#livesDiv');
 const livesEl = document.querySelector('#livesEl');
 const moneyEl = document.querySelector('#moneyEl');
+const lvlEl = document.querySelector('#lvlEl');
 
 
 const startLvl2Btn = document.querySelector('#startLvl2Btn')
@@ -257,17 +258,17 @@ function animate() {
 
     animationId = requestAnimationFrame(animate);
 
-    addEventListener('keydown', move, false);
-
-    checkScore();
-
-    buyLife();
-
     c.filter = 'blur(1px)';
     space.src = 'space.jpg';
     c.drawImage(space, 0, 0, canvas.width, canvas.height);
 
     player.draw();
+
+    addEventListener('keydown', move, false);
+
+    checkScore();
+
+    buyLife();
 
     updateParticles();
 
@@ -282,14 +283,14 @@ function animate() {
 }
 
 function checkScore() {
-    if (score === 2) {
+    if (score === 10) {
         cancelAnimationFrame(animationId);
         particles = [];
         removeEventListener('keydown', move, false);
         lvl2Div.style.display = 'flex';
         score++;
         scoreEl.innerHTML = score;
-    } else if (score === 4) {
+    } else if (score === 20) {
         cancelAnimationFrame(animationId);
         particles = [];
         removeEventListener('keydown', move, false);
@@ -512,21 +513,21 @@ function startGame() {
 function startLvl2() {
     init();
     animate();
-    generateCoins();
+    generateAliens();
     money = 0;
     lives = 0;
     lvl1 = false;
-    aliens = null;
-    hideDivs(startDiv, lvl2Div, lvl3Div, gameOverDiv);
-    showDivs(livesDiv, moneyDiv);
-
+    lvlEl.innerHTML = '2';
+    hideDivs(startDiv, lvl2Div, lvl3Div, gameOverDiv, moneyDiv, livesDiv);
 }
 
 function startLvl3() {
     init();
     animate();
-    generateAliens();
+    generateCoins();
+    lvlEl.innerHTML = '3';
     hideDivs(startDiv, lvl2Div, lvl3Div, gameOverDiv);
+    showDivs(livesDiv, moneyDiv);
 }
 
 function playAgain() {
